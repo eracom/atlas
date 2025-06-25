@@ -13,8 +13,6 @@ Metadata pour un cours - sous forme de Front Matter
   if page.matiere %}matiere-{{ page.matiere }} {% endif 
   %}cours-meta flex-container">
 
-  {% if (page.periodesHebdo and page.periodesHebdo != 0) or (page.periodes and page.periodes != 0) %}
-
   {% if page.code %}
   <section class="meta-section profs-visible flex-box box-25">
     <h2>
@@ -31,7 +29,8 @@ Metadata pour un cours - sous forme de Front Matter
       {% endif %} -->
     </ul>
   </section>
-  {% endif %}
+  {% endif %} <!-- page.code -->
+ 
 
   {% if page.domaine %}
     <section class="meta-section profs-visible flex-box box-25">
@@ -42,7 +41,7 @@ Metadata pour un cours - sous forme de Front Matter
         {% endfor %}
       </ul>
     </section>
-  {% endif %}
+  {% endif %}<!-- page.domaine -->
 
   {% if page.cursus %}
   <section class="meta-section flex-box box-25">
@@ -58,8 +57,9 @@ Metadata pour un cours - sous forme de Front Matter
       {% endfor %}
     </ul>
   </section>
-  {% endif %}
+  {% endif %}<!-- page.cursus -->
 
+   {% if (page.periodesHebdo and page.periodesHebdo != 0) or (page.periodes and page.periodes != 0) %}
   <section class="meta-section profs-visible flex-box box-25">
     <h2>
       Périodes
@@ -75,7 +75,10 @@ Metadata pour un cours - sous forme de Front Matter
   </section>
   {% else %}
     {% if page.competences %}
-      <section class="meta-section">
+      <section class="meta-section profs-visible flex-box box-25">
+        <h2>
+        Périodes
+        </h2>
         {% assign c_periodes = 0 %}
         {% for item in page.competences %}
           {% for key in item %}
