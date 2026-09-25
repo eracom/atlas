@@ -123,7 +123,7 @@ Metadata pour un cours - sous forme de Front Matter
 
   {% if page.competences %}
   <section class="meta-section meta-competences profs-visible flex-box box-100">
-    <h2>Compétences</h2>
+    <h2>{{ site.objectifs | default: "Objectifs" }}</h2>
 
     {% assign compSubpage = site.pages | where: 'title', 'Objectifs' %}
     {% assign compArray = compSubpage[0].comp %}
