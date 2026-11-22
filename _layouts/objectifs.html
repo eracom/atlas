@@ -17,133 +17,328 @@
       {% comment %}
         Tableau des objectifs, alimenté par _data/objectifs.yml
         domaine > compétence > objectif (ids a, a1, a1.1 / a1.2-AP / a1.2-CP)
-        Les pages de cours (layout "cours") référencent les objectifs par l'id sans suffixe
-        (ex. a1.2) : un cours CP est rattaché à a1.2-CP, un cours AP à a1.2-AP.
-      {% endcomment %}
-      {% assign cours = site.pages | where: "layout", "cours" %}
 
-      {% assign total_cp = 0 %}
-      {% assign total_ap = 0 %}
-      {% for domaine in site.data.objectifs %}
-        {% for competence in domaine.competences %}
-          {% for objectif in competence.objectifs %}
-            {% assign total_cp = total_cp | plus: objectif.periodes_CP %}
-            {% assign total_ap = total_ap | plus: objectif.periodes_AP %}
+        - Un clic sur un titre déplie / replie la description (sans JavaScript : tout reste visible).
+        - Les pages de cours (layout "cours") référencent les objectifs par l'id sans suffixe (ex. a1.2) :
+          un cours CP est rattaché à a1.2-CP, un cours AP à a1.2-AP, un id sans suffixe aux deux.
+        - Le semestre vient du champ "cursus" du cours (ex. "- Duals: S5").
+      {% endcomment %}
+      {% assign cours_all = site.pages | where: "layout", "cours" %}
+
+      {% comment %}
+        Tri des cours par semestre (le plus petit semestre de son cursus, S1 à S8), puis par titre.
+        Un cours sans semestre passe en dernier. Résultat : cle_tri, dont le dernier segment est l'index du cours.
+      {% endcomment %}
+      {% assign cle_liste = "" %}
+      {% for c in cours_all %}
+        {% assign mini = 99 %}
+        {% for cu in c.cursus %}
+          {% for kv in cu %}
+            {% assign n = kv.last | remove: "S" | plus: 0 %}
+            {% if n > 0 and n < mini %}{% assign mini = n %}{% endif %}
           {% endfor %}
         {% endfor %}
+        {% assign cle = mini | plus: 100 | append: "-" | append: c.title | append: "-" | append: forloop.index0 %}
+        {% assign cle_liste = cle_liste | append: cle | append: "~" %}
       {% endfor %}
+      {% assign cle_tri = cle_liste | split: "~" | sort %}
+
+      <div class="obj-tools" hidden>
+        <button type="button" class="obj-btn" data-action="open-all">Tout déplier</button>
+        <button type="button" class="obj-btn" data-action="close-all">Tout replier</button>
+        <span class="obj-hint">Cliquez sur un titre pour afficher sa description.</span>
+      </div>
 
       <table class="competences objectifs-table">
         <thead>
           <tr>
-            <th class="col-objectif">Objectif</th>
-            <th class="col-description">Description</th>
-            <th class="col-periodes">Périodes CP</th>
-            <th class="col-periodes">Périodes AP</th>
-            <th class="col-cours">Cours</th>
+            <th class="col-objectif" scope="col">Objectif</th>
+            <th class="col-cours" scope="col">Cours concernés</th>
           </tr>
         </thead>
 
         {% for domaine in site.data.objectifs %}
+        {% assign dom_cp = 0 %}
+        {% for competence in domaine.competences %}
+          {% for objectif in competence.objectifs %}
+            {% assign dom_cp = dom_cp | plus: objectif.periodes_CP %}
+          {% endfor %}
+        {% endfor %}
         <tbody class="domaine" id="domaine-{{ domaine.id }}">
-          <tr class="domaine-titre">
-            <th colspan="5">{{ domaine.id | upcase }} – {{ domaine.titre }}</th>
+          <tr class="domaine-titre{% if domaine.description or dom_cp > 0 %} toggle-row{% endif %}">
+            <th colspan="2" scope="colgroup">
+              <span class="legende">Domaine de compétences</span>
+              {% if domaine.description or dom_cp > 0 %}<button type="button" class="toggle" aria-expanded="true"><span class="chevron" aria-hidden="true"></span>{% endif %}<span class="id">{{ domaine.id | upcase }}</span> {{ domaine.titre }}{% if domaine.description or dom_cp > 0 %}</button>{% endif %}
+            </th>
           </tr>
-          {% if domaine.description %}
-          <tr class="domaine-description">
-            <td colspan="5">{{ domaine.description | markdownify }}</td>
+          {% if domaine.description or dom_cp > 0 %}
+          <tr class="desc-row domaine-description">
+            <td colspan="2"><div class="desc">{{ domaine.description | markdownify }}{% if dom_cp > 0 %}<p class="periodes-cp">Périodes CP du domaine : <strong>{{ dom_cp }}</strong></p>{% endif %}</div></td>
           </tr>
           {% endif %}
 
           {% for competence in domaine.competences %}
             {% assign comp_cp = 0 %}
-            {% assign comp_ap = 0 %}
             {% for objectif in competence.objectifs %}
               {% assign comp_cp = comp_cp | plus: objectif.periodes_CP %}
-              {% assign comp_ap = comp_ap | plus: objectif.periodes_AP %}
             {% endfor %}
 
-          <tr class="competence-titre" id="{{ competence.id }}">
-            <th colspan="2">{{ competence.id }} – {{ competence.titre }}</th>
-            <th class="periodes">{% if comp_cp > 0 %}{{ comp_cp }}{% endif %}</th>
-            <th class="periodes">{% if comp_ap > 0 %}{{ comp_ap }}{% endif %}</th>
-            <th></th>
+          <tr class="competence-titre{% if competence.description or comp_cp > 0 %} toggle-row{% endif %}" id="{{ competence.id }}">
+            <th colspan="2" scope="colgroup">
+              <span class="legende">Compétence opérationnelle</span>
+              {% if competence.description or comp_cp > 0 %}<button type="button" class="toggle" aria-expanded="true"><span class="chevron" aria-hidden="true"></span>{% endif %}<span class="id">{{ competence.id }}</span> {{ competence.titre }}{% if competence.description or comp_cp > 0 %}</button>{% endif %}
+            </th>
           </tr>
-          {% if competence.description %}
-          <tr class="competence-description">
-            <td colspan="5">{{ competence.description | markdownify }}</td>
+          {% if competence.description or comp_cp > 0 %}
+          <tr class="desc-row competence-description">
+            <td colspan="2"><div class="desc">{{ competence.description | markdownify }}{% if comp_cp > 0 %}<p class="periodes-cp">Périodes CP de la compétence : <strong>{{ comp_cp }}</strong></p>{% endif %}</div></td>
           </tr>
           {% endif %}
 
             {% for objectif in competence.objectifs %}
-    {% assign parts = objectif.id | split: "-" %}
-  {% assign base_id = parts[0] %}
-  {% assign suffixe = parts[1] %}
-  <tr class="objectif table-item{% if suffixe %} suffixe-{{ suffixe }}{% endif %}" id="{{ objectif.id }}">
-    <td class="titre-cours objectif-titre">
-      <span class="id">{{ objectif.id }}</span> – {{ objectif.titre }}
-      {% if objectif.taxonomie %}<span class="taxonomie">{{ objectif.taxonomie }}</span>{% endif %}
-    </td>
-    <td class="objectif-description">{{ objectif.description | markdownify }}</td>
-    <td class="periodes">{{ objectif.periodes_CP }}</td>
-    <td class="periodes">{{ objectif.periodes_AP }}</td>
-    <td class="cours-col">
-      <ul class="cours-liste">
-      {% for unCours in cours %}
-        {% assign est_ap = false %}
-        {% if unCours.path contains "objectifs-ap/" %}{% assign est_ap = true %}{% endif %}
-        {% assign ok = true %}
-        {% if suffixe == "AP" and est_ap == false %}{% assign ok = false %}{% endif %}
-        {% if suffixe == "CP" and est_ap == true %}{% assign ok = false %}{% endif %}
-        {% if ok %}
-          {% for compHash in unCours.competences %}
-            {% for item in compHash %}
-              {% if item.first == base_id %}
-        <li class="type-{{ unCours.type }}"><a href="{{ unCours.url | relative_url }}" class="no-link" data-link="{{ unCours.url | relative_url }}">{{ unCours.title }}</a>{% if item.last %} ({{ item.last }}&nbsp;p.){% endif %}</li>
+              {% assign parts = objectif.id | split: "-" %}
+              {% assign base_id = parts[0] %}
+              {% assign suffixe = parts[1] %}
+          <tr class="objectif table-item{% if suffixe %} suffixe-{{ suffixe }}{% endif %}{% if objectif.description or objectif.periodes_CP %} toggle-row{% endif %}" id="{{ objectif.id }}">
+            <td class="titre-cours objectif-titre">
+              {% if objectif.description or objectif.periodes_CP %}<button type="button" class="toggle" aria-expanded="true"><span class="chevron" aria-hidden="true"></span>{% else %}<span class="toggle-vide">{% endif %}<span class="id">{{ objectif.id }}</span>
+              <span class="titre">{{ objectif.titre }}</span>
+              {% if objectif.taxonomie %}<span class="taxonomie" title="Niveau de la taxonomie de Bloom">{{ objectif.taxonomie }}</span>{% endif %}{% if objectif.description or objectif.periodes_CP %}</button>{% else %}</span>{% endif %}
+              {% if objectif.description or objectif.periodes_CP %}
+              <div class="desc desc-inline">{{ objectif.description | markdownify }}{% if objectif.periodes_CP %}<p class="periodes-cp">Périodes CP : <strong>{{ objectif.periodes_CP }}</strong></p>{% endif %}</div>
               {% endif %}
-            {% endfor %}
-          {% endfor %}
-        {% endif %}
-      {% endfor %}
-      </ul>
-    </td>
-  </tr>
+            </td>
+            <td class="cours-col">
+              <ul class="cours-liste">
+              {% for cle in cle_tri %}
+                {% assign idx = cle | split: "-" | last | plus: 0 %}
+                {% assign unCours = cours_all[idx] %}
+                {% assign est_ap = false %}
+                {% if unCours.path contains "objectifs-ap/" %}{% assign est_ap = true %}{% endif %}
+                {% assign ok = true %}
+                {% if suffixe == "AP" and est_ap == false %}{% assign ok = false %}{% endif %}
+                {% if suffixe == "CP" and est_ap == true %}{% assign ok = false %}{% endif %}
+                {% if ok %}
+                  {% comment %} Semestre(s) du cours, d'après son champ "cursus" {% endcomment %}
+                  {% assign sem_vals = "" %}
+                  {% assign sem_txt = "" %}
+                  {% for cu in unCours.cursus %}
+                    {% for kv in cu %}
+                      {% assign sem_vals = sem_vals | append: kv.last | append: "," %}
+                      {% assign cu_nom = kv.first | replace: "Duals", "Dual" | replace: "Plein-temps", "PT" %}
+                      {% assign sem_txt = sem_txt | append: cu_nom | append: " " | append: kv.last | append: "~" %}
+                    {% endfor %}
+                  {% endfor %}
+                  {% assign sem_uniques = sem_vals | split: "," | uniq %}
+                  {% assign sem_detail = sem_txt | split: "~" %}
+
+                  {% for compHash in unCours.competences %}
+                    {% for item in compHash %}
+                      {% if item.first == base_id %}
+                <li class="type-{{ unCours.type }}">
+                  <a href="{{ unCours.url | relative_url }}" class="no-link" data-link="{{ unCours.url | relative_url }}">{{ unCours.title }}</a>
+                  <div class="cours-infos">
+                    {% if sem_uniques.size == 1 %}<span class="semestre">{{ sem_uniques[0] }}</span>{% elsif sem_uniques.size > 1 %}<span class="semestre" title="Semestre selon le cursus">{{ sem_detail | join: " · " }}</span>{% endif %}
+                    {% if item.last %}<span class="p-cours">{{ item.last }}&nbsp;p.</span>{% endif %}
+                  </div>
+                </li>
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+              </ul>
+            </td>
+          </tr>
             {% endfor %}
           {% endfor %}
         </tbody>
         {% endfor %}
 
-        <tfoot>
-          <tr class="total">
-            <th colspan="2">Total</th>
-            <th class="periodes">{{ total_cp }}</th>
-            <th class="periodes">{{ total_ap }}</th>
-            <th></th>
-          </tr>
-        </tfoot>
       </table>
 
       <style>
-        .objectifs-table { width: 100%; font-size: 0.85rem; }
-        .objectifs-table th, .objectifs-table td { vertical-align: top; }
-        .objectifs-table .col-periodes, .objectifs-table .periodes { width: 5em; text-align: right; white-space: nowrap; }
-        .objectifs-table .col-cours { width: 22%; }
-        .objectifs-table .domaine-titre th { background: #333; color: #fff; font-size: 1.1em; text-align: left; }
-        .objectifs-table .domaine-description td,
-        .objectifs-table .competence-description td { background: #fff; font-size: 0.9em; }
-        .objectifs-table .competence-titre th { background: #dcdcdc; text-align: left; }
-        .objectifs-table .competence-titre th.periodes { text-align: right; }
-        .objectifs-table .objectif-titre .id { font-weight: bold; }
-        .objectifs-table .taxonomie { display: inline-block; margin-left: .3em; padding: 0 .4em; border: 1px solid #333; border-radius: 3px; font-size: .8em; }
-        .objectifs-table .objectif-description p:first-child { margin-top: 0; }
-        .objectifs-table .objectif-description ul { margin-bottom: .5em; }
-        .objectifs-table .cours-liste { margin: 0; padding-left: 1em; }
-        .objectifs-table .total th { background: #333; color: #fff; text-align: left; }
-        .objectifs-table .total th.periodes { text-align: right; }
-        .objectifs-table .type-AP { background-color: #e8f0e8; }
-        .objectifs-table .suffixe-AP .objectif-titre { border-left: 4px solid #7a9f7a; }
-        .objectifs-table .suffixe-CP .objectif-titre { border-left: 4px solid #6a8fc7; }
+        .objectifs-table {
+          --obj-border: #d9dde3;
+          --obj-soft: #f4f6f8;
+          --obj-ink: #1f2933;
+          --obj-muted: #6b7785;
+          --obj-accent: #0b7fd6;
+          --obj-ap: #3f8a5b;
+          --obj-cp: #3b6fb6;
+          width: 100%;
+          table-layout: fixed;
+          border-collapse: collapse;
+          font-size: 0.9rem;
+          color: var(--obj-ink);
+        }
+        .objectifs-table th, .objectifs-table td {
+          border: 0;
+          border-bottom: 1px solid var(--obj-border);
+          padding: .55rem .75rem;
+          vertical-align: top;
+          text-align: left;
+        }
+        .objectifs-table thead th {
+          position: sticky; top: 0; z-index: 2;
+          background: #fff;
+          border-bottom: 2px solid var(--obj-ink);
+          font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; color: var(--obj-muted);
+        }
+        .objectifs-table .col-cours { width: 38%; }
+        .objectifs-table .legende {
+          display: block; margin-bottom: .1rem; font-size: .68rem; font-weight: 500; letter-spacing: .06em;
+          text-transform: uppercase; opacity: .6;
+        }
+        .objectifs-table .periodes-cp { margin: .6rem 0 0; font-size: .82rem; color: var(--obj-muted); }
+        .objectifs-table .periodes-cp strong { color: var(--obj-ink); }
+
+        /* Domaines et compétences */
+        .objectifs-table .domaine-titre th {
+          background: var(--obj-ink); color: #fff; font-size: 1.05rem; padding: .8rem .75rem; border-bottom: 0;
+        }
+        .objectifs-table .domaine-titre .id { display: inline-block; min-width: 1.4em; margin-right: .4em; opacity: .7; }
+        .objectifs-table .competence-titre th {
+          background: var(--obj-soft); font-size: .95rem; border-top: 8px solid #fff; border-bottom: 1px solid var(--obj-border);
+        }
+        .objectifs-table .competence-titre .id { color: var(--obj-accent); margin-right: .4em; }
+
+        /* Boutons de dépliage */
+        .objectifs-table .toggle {
+          all: unset; box-sizing: border-box; display: block; width: 100%;
+          cursor: default; font: inherit; color: inherit;
+        }
+        .js-objectifs .objectifs-table .toggle { cursor: pointer; }
+        .objectifs-table .toggle:focus-visible { outline: 2px solid var(--obj-accent); outline-offset: 2px; border-radius: 3px; }
+        .objectifs-table .chevron, .objectifs-table .toggle-vide::before { display: none; }
+        .js-objectifs .objectifs-table .chevron {
+          display: inline-block; width: .55em; height: .55em; margin-right: .6em;
+          border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+          transform: rotate(-45deg); transition: transform .15s ease; vertical-align: .05em; opacity: .75;
+        }
+        .js-objectifs .objectifs-table .toggle-row.open .chevron { transform: rotate(45deg); }
+        .js-objectifs .objectifs-table tr.objectif:hover td { background: #f8fbff; }
+        .js-objectifs .objectifs-table tr.objectif.toggle-row td.objectif-titre { cursor: pointer; }
+
+        /* Lignes d'objectifs */
+        .objectifs-table .objectif-titre .id {
+          display: inline-block; min-width: 3.1em; margin-right: .3em; font-weight: 700; color: var(--obj-accent);
+        }
+        .objectifs-table .objectif-titre .titre { font-weight: 500; }
+        .objectifs-table .taxonomie {
+          display: inline-block; margin-left: .4em; padding: 0 .45em; border: 1px solid var(--obj-border);
+          border-radius: 999px; font-size: .72rem; color: var(--obj-muted); background: #fff; white-space: nowrap;
+        }
+
+        /* Descriptions repliables */
+        .objectifs-table .desc-row td { background: #fbfcfd; padding: .2rem .75rem .9rem 3.6rem; font-size: .88rem; line-height: 1.5; color: #3b4652; }
+        .objectifs-table .domaine-description td, .objectifs-table .competence-description td { padding-left: .75rem; }
+        .objectifs-table .desc { max-width: 40em; }
+        .objectifs-table .desc > :first-child { margin-top: .4rem; }
+        .objectifs-table .desc > :last-child { margin-bottom: 0; }
+        .objectifs-table .desc ul { margin: .3rem 0 .3rem 1.1rem; padding: 0; }
+        .objectifs-table .desc li { margin: .15rem 0; }
+        .objectifs-table .desc-inline { margin: .5rem 0 .2rem 1rem; font-size: .88rem; line-height: 1.5; color: #3b4652; font-weight: 400; cursor: auto; }
+        .js-objectifs .objectifs-table .desc-inline { display: none; }
+        .js-objectifs .objectifs-table .desc-inline.open { display: block; }
+        .js-objectifs .objectifs-table .desc-row { display: none; }
+        .js-objectifs .objectifs-table .desc-row.open { display: table-row; }
+
+        /* Cours concernés */
+        .objectifs-table .cours-liste { list-style: none; margin: 0; padding: 0; }
+        .objectifs-table td.cours-col { padding: 0; }
+        .objectifs-table .cours-col .cours-liste > li {
+          display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: baseline; gap: .5rem;
+          margin: 0; padding: .5rem 1rem; line-height: 1.3;
+        }
+        .objectifs-table .cours-infos {
+          display: flex; flex: 0 0 auto; align-items: baseline; justify-content: flex-end; gap: .45rem;
+          margin-left: auto; white-space: nowrap;
+        }
+        .objectifs-table .cours-col .cours-liste > li + li { border-top: 1px solid #000; }
+        .objectifs-table .cours-liste a { flex: 1 1 0; min-width: 0; text-align: left; color: var(--obj-ink); text-decoration: none; border-bottom: 0; }
+        .objectifs-table .cours-liste a:hover { color: var(--obj-accent); text-decoration: none; border-bottom: 0; }
+        .objectifs-table .semestre {
+          padding: 0 .45em; border-radius: 4px; font-size: .72rem; font-weight: 600; white-space: nowrap;
+          background: #fff; color: #000;
+        }
+        .objectifs-table .p-cours { font-size: .75rem; color: var(--obj-muted); white-space: nowrap; min-width: 2.5em; text-align: right; }
+
+        /* Outils */
+        .obj-tools { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 1rem 0; }
+        .js-objectifs .obj-tools { display: flex; }
+        .obj-btn { font: inherit; font-size: .8rem; padding: .3rem .8rem; border: 1px solid var(--obj-border, #d9dde3); background: #fff; border-radius: 6px; cursor: pointer; }
+        .obj-btn:hover { background: #f4f6f8; }
+        .obj-hint { font-size: .8rem; color: #6b7785; }
+
+        /* Petits écrans */
+        @media (max-width: 42rem) {
+          .objectifs-table { table-layout: auto; font-size: .85rem; }
+          .objectifs-table .col-cours, .objectifs-table .cours-col { display: none; }
+          .objectifs-table .desc-row td { padding-left: .75rem; }
+          .objectifs-table .desc-inline { margin-left: 1.2rem; }
+        }
+
+        /* Impression : tout déplié */
+        @media print {
+          .obj-tools { display: none !important; }
+          .js-objectifs .objectifs-table .desc-row { display: table-row; }
+          .js-objectifs .objectifs-table .desc-inline { display: block; }
+          .objectifs-table thead th { position: static; }
+          .objectifs-table .chevron { display: none !important; }
+        }
       </style>
+
+      <script>
+        (function () {
+          var root = document.documentElement;
+          root.classList.add('js-objectifs');
+          var tools = document.querySelector('.obj-tools');
+          if (tools) { tools.hidden = false; }
+
+          var table = document.querySelector('.objectifs-table');
+          if (!table) { return; }
+
+          function setOpen(row, open) {
+            var desc = row.querySelector('.desc-inline');
+            if (!desc) {
+              desc = row.nextElementSibling;
+              if (!desc || !desc.classList.contains('desc-row')) { return; }
+            }
+            row.classList.toggle('open', open);
+            desc.classList.toggle('open', open);
+            var b = row.querySelector('.toggle');
+            if (b) { b.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+          }
+
+          var rows = table.querySelectorAll('tr.toggle-row');
+          // Tout est replié au départ, sauf si l'adresse pointe sur un objectif précis.
+          Array.prototype.forEach.call(rows, function (r) { setOpen(r, false); });
+
+          table.addEventListener('click', function (e) {
+            if (e.target.closest('a') || e.target.closest('.desc-inline')) { return; }
+            var row = e.target.closest('tr.toggle-row');
+            if (!row) { return; }
+            setOpen(row, !row.classList.contains('open'));
+          });
+
+          if (tools) {
+            tools.addEventListener('click', function (e) {
+              var a = e.target.getAttribute('data-action');
+              if (!a) { return; }
+              Array.prototype.forEach.call(rows, function (r) { setOpen(r, a === 'open-all'); });
+            });
+          }
+
+          function openFromHash() {
+            if (!location.hash) { return; }
+            var el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+            if (el && el.classList.contains('toggle-row')) { setOpen(el, true); el.scrollIntoView(); }
+          }
+          openFromHash();
+          window.addEventListener('hashchange', openFromHash);
+        })();
+      </script>
 
       {% include footer.html %}
     </main>
