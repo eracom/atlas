@@ -4,4 +4,3 @@ Gemfile.lock
 *.gem
 *.code-workspace
 .vscode
-/_dev
