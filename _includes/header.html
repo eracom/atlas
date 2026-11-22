@@ -3,7 +3,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow,nosnippet,noarchive">
 {% include favicon.html %}
-<link rel="stylesheet" href="{{ '/assets/css/style.css?v=' 
-  | append: site.github.build_revision 
-  | relative_url }}">
+{% comment %}
+  Cache-buster : ?v= prend l'heure du build (site.time), qui change à chaque
+  génération du site, y compris quand seul Atlas a été modifié.
+  À réutiliser pour les autres assets : ?v={{ site.time | date: '%s' }}
+{% endcomment %}
+<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 {% include couleurs.html %}
