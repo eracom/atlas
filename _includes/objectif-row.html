@@ -1,0 +1,38 @@
+{% comment %}
+  Une ligne du tableau des objectifs.
+  Paramètres : include.objectif (entrée de _data/objectifs.yml), include.cours (pages de layout "cours")
+  Un id comme "a1.2-CP" est rattaché aux cours CP qui citent "a1.2" ; "a1.2-AP" aux cours AP ;
+  un id sans suffixe (ex. "b1.1") est rattaché aux cours CP et AP.
+{% endcomment %}
+{% assign parts = include.objectif.id | split: "-" %}
+{% assign base_id = parts[0] %}
+{% assign suffixe = parts[1] %}
+<tr class="objectif table-item{% if suffixe %} suffixe-{{ suffixe }}{% endif %}" id="{{ include.objectif.id }}">
+  <td class="titre-cours objectif-titre">
+    <span class="id">{{ include.objectif.id }}</span> – {{ include.objectif.titre }}
+    {% if include.objectif.taxonomie %}<span class="taxonomie">{{ include.objectif.taxonomie }}</span>{% endif %}
+  </td>
+  <td class="objectif-description">{{ include.objectif.description | markdownify }}</td>
+  <td class="periodes">{{ include.objectif.periodes_CP }}</td>
+  <td class="periodes">{{ include.objectif.periodes_AP }}</td>
+  <td class="cours-col">
+    <ul class="cours-liste">
+    {% for unCours in include.cours %}
+      {% assign est_ap = false %}
+      {% if unCours.path contains "objectifs-ap/" %}{% assign est_ap = true %}{% endif %}
+      {% assign ok = true %}
+      {% if suffixe == "AP" and est_ap == false %}{% assign ok = false %}{% endif %}
+      {% if suffixe == "CP" and est_ap == true %}{% assign ok = false %}{% endif %}
+      {% if ok %}
+        {% for compHash in unCours.competences %}
+          {% for item in compHash %}
+            {% if item.first == base_id %}
+      <li class="type-{{ unCours.type }}"><a href="{{ unCours.url | relative_url }}" class="no-link" data-link="{{ unCours.url | relative_url }}">{{ unCours.title }}</a>{% if item.last %} ({{ item.last }}&nbsp;p.){% endif %}</li>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    </ul>
+  </td>
+</tr>
