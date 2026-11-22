@@ -14,7 +14,9 @@ Ce dossier contient un thème Jekyll, dérivé du [thème Cayman](https://github
 
 ## Développement local du thème 🛠️
 
-Les sites peuvent pointer vers ce dossier avec des liens symboliques (`_includes`, `_layouts`, `_sass`, `assets`). Mais la gem `github-pages` impose le mode `safe`, même en local : les **includes** en lien symbolique sont alors ignorés, et Jekyll utilise ceux d'Atlas sur GitHub (les layouts, eux, sont bien lus).
+Les styles sont dans un seul fichier, `assets/css/style.css`, en CSS natif (variables CSS, imbrication) : aucune compilation Sass n'est nécessaire.
+
+Les sites peuvent pointer vers ce dossier avec des liens symboliques (`_includes`, `_layouts`, `assets`). Mais la gem `github-pages` impose le mode `safe`, même en local : les **includes** en lien symbolique sont alors ignorés, et Jekyll utilise ceux d'Atlas sur GitHub (les layouts, eux, sont bien lus).
 
 Pour tester les includes locaux, lancer le site avec le script fourni, depuis le dossier du site :
 

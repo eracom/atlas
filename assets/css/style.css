@@ -1,0 +1,1085 @@
+@charset "UTF-8";
+
+/*
+ * Atlas – styles du thème
+ * Dérivé du thème Cayman, en CSS natif (variables, imbrication, media queries).
+ *
+ * Points de rupture (les variables CSS ne sont pas utilisables dans @media) :
+ *   petit  : width <= 42em
+ *   moyen  : 42em <= width <= 64em
+ *   grand  : width >= 64em
+ */
+
+/* Variables */
+
+:root {
+  --black: #333;
+  --pale: #eee;
+  --sombre: #a0a0a0;
+  --link-color: #009fff;
+  --blockquote-text-color: #819198;
+  --code-bg-color: #f3f6fa;
+  --code-text-color: #333;
+  --border-color: #dce6f0;
+  --hr-border-color: #eff0f1;
+
+  /* Tableau des objectifs */
+  --obj-border: #d9dde3;
+  --obj-soft: #f4f6f8;
+  --obj-ink: #1f2933;
+  --obj-muted: #6b7785;
+  --obj-accent: #0b7fd6;
+  --obj-ap: #3f8a5b;
+  --obj-cp: #3b6fb6;
+}
+
+/* Base */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Plain", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--black);
+}
+
+#skip-to-content {
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  overflow: hidden;
+  top: -10px;
+
+  &:focus {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    height: auto;
+    width: auto;
+    background: #fcfbfb;
+    outline: thick solid #fcfbfb;
+  }
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.bold {
+  font-weight: bold;
+}
+
+/* Exposants et indices sans agrandir l'interligne */
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+/* Boutons (navigation) */
+
+.btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--black);
+  background-color: var(--pale);
+  border-color: var(--black);
+  border-style: solid;
+  border-width: 0 0 2px 0;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+
+  &:hover,
+  &.active {
+    text-decoration: none;
+    background-color: var(--black);
+    color: white;
+  }
+
+  &.active {
+    background-color: var(--sombre);
+  }
+
+  + .btn {
+    margin-left: 1rem;
+  }
+
+  @media screen and (width >= 64em) {
+    padding: 0.75rem 1rem;
+  }
+
+  @media screen and (42em <= width <= 64em) {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  @media screen and (width <= 42em) {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+
+    + .btn {
+      margin-top: 1rem;
+      margin-left: 0;
+    }
+  }
+}
+
+/* En-tête */
+
+.page-header {
+  color: var(--black);
+  text-align: left;
+  background-color: #fff;
+
+  @media screen and (width >= 64em) {
+    padding: 5rem 0;
+  }
+
+  @media screen and (42em <= width <= 64em) {
+    padding: 3rem 0;
+  }
+
+  @media screen and (width <= 42em) {
+    padding: 2rem 0;
+  }
+
+  a {
+    color: var(--black);
+  }
+
+  ul {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding-left: 0;
+  }
+
+  ul li {
+    margin-right: 1em;
+    list-style: none;
+  }
+}
+
+.project-name {
+  margin-top: 0;
+  margin-bottom: 0.1rem;
+  font-weight: 400;
+
+  @media screen and (width >= 64em) {
+    font-size: 3.25rem;
+  }
+
+  @media screen and (42em <= width <= 64em) {
+    font-size: 2.25rem;
+  }
+
+  @media screen and (width <= 42em) {
+    font-size: 1.75rem;
+  }
+}
+
+.project-tagline {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  font-weight: normal;
+  opacity: 0.7;
+
+  @media screen and (width >= 64em) {
+    font-size: 1.25rem;
+  }
+
+  @media screen and (42em <= width <= 64em) {
+    font-size: 1.15rem;
+  }
+
+  @media screen and (width <= 42em) {
+    font-size: 1rem;
+  }
+}
+
+.page-header,
+.main-content {
+  @media screen and (width >= 64em) {
+    max-width: 64rem;
+    padding: 2rem 6rem;
+    margin: 0 auto;
+    font-size: 1.1rem;
+  }
+
+  @media screen and (42em <= width <= 64em) {
+    padding: 2rem 4rem;
+    font-size: 1.1rem;
+  }
+
+  @media screen and (width <= 42em) {
+    padding: 2rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Contenu principal */
+
+.main-content {
+  overflow-wrap: break-word;
+
+  :first-child {
+    margin-top: 0;
+  }
+
+  kbd {
+    background-color: #fafbfc;
+    border: 1px solid #c6cbd1;
+    border-bottom-color: #959da5;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #959da5;
+    color: #444d56;
+    display: inline-block;
+    font-size: 11px;
+    line-height: 10px;
+    padding: 3px 5px;
+    vertical-align: middle;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: normal;
+    color: var(--black);
+  }
+
+  p {
+    margin-bottom: 1em;
+  }
+
+  code {
+    padding: 2px 4px;
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 0.9rem;
+    color: var(--code-text-color);
+    background-color: var(--code-bg-color);
+    border-radius: 0.3rem;
+  }
+
+  pre {
+    padding: 0.8rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font: 1rem Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--code-text-color);
+    overflow: auto;
+    overflow-wrap: normal;
+    background-color: var(--code-bg-color);
+    border: solid 1px var(--border-color);
+    border-radius: 0.3rem;
+
+    > code {
+      padding: 0;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--code-text-color);
+      word-break: normal;
+      white-space: pre;
+      background: transparent;
+      border: 0;
+    }
+  }
+
+  pre code,
+  pre tt {
+    display: inline;
+    max-width: initial;
+    padding: 0;
+    margin: 0;
+    overflow: initial;
+    line-height: inherit;
+    overflow-wrap: normal;
+    background-color: transparent;
+    border: 0;
+
+    &::before,
+    &::after {
+      content: normal;
+    }
+  }
+
+  ul,
+  ol {
+    margin-top: 0;
+    padding-left: 1.2rem;
+  }
+
+  blockquote {
+    padding: 0 1rem;
+    margin-left: 0;
+    color: var(--blockquote-text-color);
+    border-left: 0.3rem solid #c7c7c7;
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  table {
+    display: table;
+    width: 100%;
+    overflow: auto;
+    word-break: keep-all;
+
+    th {
+      font-weight: bold;
+    }
+
+    th,
+    td {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--black);
+    }
+  }
+
+  tbody {
+    width: 100%;
+    display: table-row-group;
+  }
+
+  dl {
+    padding: 0;
+
+    dt {
+      padding: 0;
+      margin-top: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    dd {
+      padding: 0;
+      margin-bottom: 1rem;
+    }
+  }
+
+  hr {
+    height: 2px;
+    padding: 0;
+    margin: 1rem 0;
+    background-color: var(--hr-border-color);
+    border: 0;
+  }
+}
+
+#content {
+  padding-top: 0;
+}
+
+.liste-horizontale,
+.main-content .liste-horizontale {
+  padding: 0;
+  margin-bottom: 0.2em;
+}
+
+.liste-horizontale li {
+  display: inline;
+  list-style: none;
+
+  &:not(:last-child)::after {
+    content: " / ";
+  }
+}
+
+/* Pied de page */
+
+.site-footer {
+  padding-top: 2rem;
+  margin-top: 2rem;
+  border-top: solid 1px var(--hr-border-color);
+  font-size: 1rem;
+
+  @media screen and (width <= 42em) {
+    font-size: 0.9rem;
+  }
+}
+
+.site-footer-owner {
+  display: block;
+  font-weight: bold;
+}
+
+.site-footer-credits {
+  color: var(--blockquote-text-color);
+}
+
+/* Modèle Cours */
+
+.cours-meta {
+  font-size: 1rem;
+  background: var(--pale);
+  padding: 1.5rem;
+  border: 2px solid var(--black);
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 0.2em;
+    font-size: 1.3rem;
+  }
+
+  p {
+    margin: 0.5em 0;
+  }
+
+  ul:last-child {
+    margin-bottom: 0;
+  }
+
+  /* colonnes */
+
+  @media screen and (42em <= width <= 64em) {
+    column-count: 2;
+    column-gap: 3vw;
+    column-rule: 1px solid var(--black);
+  }
+
+  @media screen and (width >= 64em) {
+    column-count: 3;
+    column-gap: 3vw;
+    column-rule: 1px solid var(--black);
+  }
+
+  .meta-section {
+    margin-bottom: 0.5em;
+    break-inside: avoid;
+  }
+
+  .meta-competences {
+    column-span: all;
+    margin-top: 1em;
+  }
+}
+
+.main-content-columns {
+  margin-top: 2rem;
+}
+
+/* Tableaux du cursus */
+
+.cursus {
+  .titre-cours {
+    padding: 0;
+  }
+
+  a {
+    color: #333;
+    display: block;
+    padding: 0.5rem 1rem;
+  }
+
+  .details {
+    font-size: 0.8em;
+    list-style: none;
+    padding-left: 2em;
+  }
+}
+
+.code {
+  font-size: 0.8em;
+  padding: 0 0 0.5rem 1rem;
+}
+
+.periodes {
+  width: 5em;
+}
+
+.description {
+  padding: 0 1.5em 1em;
+}
+
+.table-item {
+  background-color: #f1f1f1;
+}
+
+.total-periodes {
+  padding-left: 1em;
+}
+
+/* Vue globale */
+
+.global .main-content {
+  margin: 0;
+  padding: 1em;
+  max-width: 100% !important;
+}
+
+.vue-globale {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.5rem;
+  justify-content: space-between;
+
+  .cursus .details {
+    font-size: 0.5rem;
+  }
+
+  .section-cursus {
+    flex: 0 1 12%;
+
+    /* Gouttière des colonnes */
+    &:not(:last-child) {
+      margin-right: 1rem;
+    }
+  }
+}
+
+.global .profs {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+td.code {
+  display: none;
+}
+
+.global .competences {
+  display: none !important;
+}
+
+.global .periodes {
+  padding: 0.2rem;
+  width: 2rem;
+}
+
+/*
+ * Tableau des objectifs (layout « objectifs »)
+ * Le dépliage est géré par le script du layout, qui ajoute la classe
+ * .js-objectifs sur <html> ; sans JavaScript, tout reste visible.
+ */
+
+.objectifs-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  color: var(--obj-ink);
+
+  th,
+  td {
+    border: 0;
+    border-bottom: 1px solid var(--obj-border);
+    padding: 0.55rem 0.75rem;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #fff;
+    border-bottom: 2px solid var(--obj-ink);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--obj-muted);
+  }
+
+  .col-cours {
+    width: 38%;
+  }
+
+  .legende {
+    display: block;
+    margin-bottom: 0.1rem;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .periodes-cp {
+    margin: 0.6rem 0 0;
+    font-size: 0.82rem;
+    color: var(--obj-muted);
+
+    strong {
+      color: var(--obj-ink);
+    }
+  }
+
+  /* Domaines et compétences */
+
+  .domaine-titre {
+    th {
+      background: var(--obj-ink);
+      color: #fff;
+      font-size: 1.05rem;
+      padding: 0.8rem 0.75rem;
+      border-bottom: 0;
+    }
+
+    .id {
+      display: inline-block;
+      min-width: 1.4em;
+      margin-right: 0.4em;
+      opacity: 0.7;
+    }
+  }
+
+  .competence-titre {
+    th {
+      background: var(--obj-soft);
+      font-size: 0.95rem;
+      border-top: 8px solid #fff;
+      border-bottom: 1px solid var(--obj-border);
+    }
+
+    .id {
+      color: var(--obj-accent);
+      margin-right: 0.4em;
+    }
+  }
+
+  /* Boutons de dépliage */
+
+  .toggle {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    cursor: default;
+    font: inherit;
+    color: inherit;
+
+    &:focus-visible {
+      outline: 2px solid var(--obj-accent);
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
+  }
+
+  .chevron,
+  .toggle-vide::before {
+    display: none;
+  }
+
+  .js-objectifs & {
+    .toggle {
+      cursor: pointer;
+    }
+
+    .chevron {
+      display: inline-block;
+      width: 0.55em;
+      height: 0.55em;
+      margin-right: 0.6em;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      transition: transform 0.15s ease;
+      vertical-align: 0.05em;
+      opacity: 0.75;
+    }
+
+    .toggle-row.open .chevron {
+      transform: rotate(45deg);
+    }
+
+    tr.objectif:hover td {
+      background: #f8fbff;
+    }
+
+    tr.objectif.toggle-row td.objectif-titre {
+      cursor: pointer;
+    }
+  }
+
+  /* Lignes d'objectifs */
+
+  .objectif-titre {
+    .id {
+      display: inline-block;
+      min-width: 3.1em;
+      margin-right: 0.3em;
+      font-weight: 700;
+      color: var(--obj-accent);
+    }
+
+    .titre {
+      font-weight: 500;
+    }
+  }
+
+  .taxonomie {
+    display: inline-block;
+    margin-left: 0.4em;
+    padding: 0 0.45em;
+    border: 1px solid var(--obj-border);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    color: var(--obj-muted);
+    background: #fff;
+    white-space: nowrap;
+  }
+
+  /* Descriptions repliables */
+
+  .desc-row td {
+    background: #fbfcfd;
+    padding: 0.2rem 0.75rem 0.9rem 3.6rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #3b4652;
+  }
+
+  .domaine-description td,
+  .competence-description td {
+    padding-left: 0.75rem;
+  }
+
+  .desc {
+    max-width: 40em;
+
+    > :first-child {
+      margin-top: 0.4rem;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin: 0.3rem 0 0.3rem 1.1rem;
+      padding: 0;
+    }
+
+    li {
+      margin: 0.15rem 0;
+    }
+  }
+
+  .desc-inline {
+    margin: 0.5rem 0 0.2rem 1rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #3b4652;
+    font-weight: 400;
+    cursor: auto;
+  }
+
+  .js-objectifs & {
+    .desc-inline {
+      display: none;
+    }
+
+    .desc-inline.open {
+      display: block;
+    }
+
+    .desc-row {
+      display: none;
+    }
+
+    .desc-row.open {
+      display: table-row;
+    }
+  }
+
+  /* Cours concernés */
+
+  .cours-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  td.cours-col {
+    padding: 0;
+  }
+
+  .cours-col .cours-liste > li {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    line-height: 1.3;
+  }
+
+  .cours-infos {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .cours-col .cours-liste > li + li {
+    border-top: 1px solid #000;
+  }
+
+  .cours-liste a {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: left;
+    color: var(--obj-ink);
+    text-decoration: none;
+    border-bottom: 0;
+
+    &:hover {
+      color: var(--obj-accent);
+      text-decoration: none;
+      border-bottom: 0;
+    }
+  }
+
+  .semestre {
+    padding: 0 0.45em;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+    background: #fff;
+    color: #000;
+  }
+
+  .p-cours {
+    font-size: 0.75rem;
+    color: var(--obj-muted);
+    white-space: nowrap;
+    min-width: 2.5em;
+    text-align: right;
+  }
+
+  /* Petits écrans */
+
+  @media (max-width: 42rem) {
+    table-layout: auto;
+    font-size: 0.85rem;
+
+    .col-cours,
+    .cours-col {
+      display: none;
+    }
+
+    .desc-row td {
+      padding-left: 0.75rem;
+    }
+
+    .desc-inline {
+      margin-left: 1.2rem;
+    }
+  }
+}
+
+/* Outils du tableau des objectifs (Tout déplier / Tout replier) */
+
+.obj-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.obj-btn {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--obj-border);
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--obj-soft);
+  }
+}
+
+.obj-hint {
+  font-size: 0.8rem;
+  color: var(--obj-muted);
+}
+
+/* Impression */
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    color: #000 !important; /* Le noir s'imprime plus vite */
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  pre {
+    white-space: pre-wrap !important;
+  }
+
+  pre,
+  blockquote,
+  tr,
+  img {
+    break-inside: avoid;
+  }
+
+  /*
+   * Impression des tableaux :
+   * https://web.archive.org/web/20180815150934/http://css-discuss.incutio.com/wiki/Printing_Tables
+   */
+  thead {
+    display: table-header-group;
+  }
+
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  .page-header {
+    padding-left: 0;
+    padding-right: 2pt;
+    float: left;
+  }
+
+  .global .main-content {
+    padding: 1px;
+  }
+
+  .project-name::after {
+    content: " – ";
+  }
+
+  h1,
+  h2,
+  .body-cours .project-name,
+  .body-cours h1,
+  .body-default .project-name,
+  .body-default h1 {
+    font-size: 14pt;
+  }
+
+  .project-name,
+  .global h1 {
+    font-size: 10pt;
+  }
+
+  .main-content-cours .cours-meta {
+    column-count: 3;
+    column-gap: 2em;
+  }
+
+  .cours-meta .meta-competences {
+    column-count: 3;
+
+    h2 {
+      column-span: all;
+      border-top: 1px solid black;
+      padding-top: 1em;
+    }
+  }
+
+  .main-content-columns {
+    column-count: 2;
+    column-gap: 2em;
+  }
+
+  .main-content-cours .cours-meta h2 {
+    font-size: 12pt;
+  }
+
+  .main-content p,
+  .main-content li {
+    font-size: 10pt;
+  }
+
+  .main-content.global p,
+  .main-content.global li {
+    font-size: 9pt;
+  }
+
+  .main-content.global .cursus,
+  .main-content.global .cursus p,
+  .main-content.global .cursus li {
+    font-size: 8pt;
+  }
+
+  .page-header .project-tagline,
+  .page-header .page-nav {
+    display: none;
+  }
+
+  .edit-link {
+    display: none !important;
+  }
+
+  .site-footer {
+    display: none;
+  }
+
+  /* Tableau des objectifs : tout déplié */
+
+  .obj-tools {
+    display: none !important;
+  }
+
+  .js-objectifs .objectifs-table .desc-row {
+    display: table-row;
+  }
+
+  .js-objectifs .objectifs-table .desc-inline {
+    display: block;
+  }
+
+  .objectifs-table thead th {
+    position: static;
+  }
+
+  .objectifs-table .chevron {
+    display: none !important;
+  }
+}

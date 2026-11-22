@@ -25,8 +25,10 @@ illustre le résultat.
   `cursus`, `competences` et `export-csv`.
 - `_includes/` contient les fragments Liquid partagés, dont les métadonnées,
   la navigation et les lignes des tableaux.
-- `_sass/` et `assets/css/style.scss` définissent les styles ; `assets/js/`
-  contient le JavaScript.
+- `assets/css/style.css` contient tous les styles, en CSS natif (variables
+  CSS, imbrication, media queries) : pas de Sass ni de compilation. Les
+  variables sont déclarées dans `:root` ; les points de rupture (42em, 64em)
+  sont écrits en dur dans les `@media`. `assets/js/` contient le JavaScript.
 - `_config.yml` configure le site de ce dépôt ; `index.md` et
   `another-page.md` sont des pages de démonstration, pas un plan de formation
   complet.
