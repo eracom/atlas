@@ -157,56 +157,7 @@
 
       </table>
 
-      <script>
-        (function () {
-          var root = document.documentElement;
-          root.classList.add('js-objectifs');
-          var tools = document.querySelector('.obj-tools');
-          if (tools) { tools.hidden = false; }
-
-          var table = document.querySelector('.objectifs-table');
-          if (!table) { return; }
-
-          function setOpen(row, open) {
-            var desc = row.querySelector('.desc-inline');
-            if (!desc) {
-              desc = row.nextElementSibling;
-              if (!desc || !desc.classList.contains('desc-row')) { return; }
-            }
-            row.classList.toggle('open', open);
-            desc.classList.toggle('open', open);
-            var b = row.querySelector('.toggle');
-            if (b) { b.setAttribute('aria-expanded', open ? 'true' : 'false'); }
-          }
-
-          var rows = table.querySelectorAll('tr.toggle-row');
-          // Tout est replié au départ, sauf si l'adresse pointe sur un objectif précis.
-          Array.prototype.forEach.call(rows, function (r) { setOpen(r, false); });
-
-          table.addEventListener('click', function (e) {
-            if (e.target.closest('a') || e.target.closest('.desc-inline')) { return; }
-            var row = e.target.closest('tr.toggle-row');
-            if (!row) { return; }
-            setOpen(row, !row.classList.contains('open'));
-          });
-
-          if (tools) {
-            tools.addEventListener('click', function (e) {
-              var a = e.target.getAttribute('data-action');
-              if (!a) { return; }
-              Array.prototype.forEach.call(rows, function (r) { setOpen(r, a === 'open-all'); });
-            });
-          }
-
-          function openFromHash() {
-            if (!location.hash) { return; }
-            var el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-            if (el && el.classList.contains('toggle-row')) { setOpen(el, true); el.scrollIntoView(); }
-          }
-          openFromHash();
-          window.addEventListener('hashchange', openFromHash);
-        })();
-      </script>
+      <script src="{{ '/assets/js/depliage.js' | relative_url }}"></script>
 
       {% include footer.html %}
     </main>
