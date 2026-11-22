@@ -97,6 +97,13 @@ sub {
   bottom: -0.25em;
 }
 
+/* Tableaux : bordures fusionnées */
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
 /* Boutons (navigation) */
 
 .btn {
