@@ -18,7 +18,124 @@
   <main id="content" class="main-content main-content-cours" role="main">
 
     <h1>{{ page.title }}</h1>
-    {% include meta.html %}
+
+    {% comment %}
+      Section d'introduction du cours (remplace l'include meta.html).
+      - Les objectifs évaluateurs sont dépliables ; leur titre, niveau de taxonomie et description
+        viennent de _data/objectifs.yml.
+      - Un cours CP est rattaché aux ids sans suffixe ou en -CP, un cours AP aux ids sans suffixe ou en -AP.
+      - Les ids qui n'existent pas (ou plus) dans objectifs.yml restent affichés, sans description :
+        leur titre est repris de la liste "comp" de la page Objectifs, si elle existe encore.
+    {% endcomment %}
+    {% assign timeunit = page.timeunit | default: "Semestre" %}
+    {% assign suffixe_page = "CP" %}
+    {% if page.path contains "objectifs-ap/" %}{% assign suffixe_page = "AP" %}{% endif %}
+
+    {% comment %} Total de périodes : champ "periodes", sinon somme des périodes par objectif {% endcomment %}
+    {% assign total_periodes = 0 %}
+    {% if page.periodes %}
+      {% assign total_periodes = page.periodes %}
+    {% elsif page.competences %}
+      {% for item in page.competences %}
+        {% for key in item %}
+          {% assign total_periodes = total_periodes | plus: key.last %}
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+
+    <footer class="{% if page.code %}code-{{ page.code }} {% endif %}{% if page.type %}type-{{ page.type }} {% endif %}{% if page.matiere %}matiere-{{ page.matiere }} {% endif %}cours-meta">
+
+      {% if page.code %}
+      <section class="meta-section">
+        {% assign acronymSubpage = site.pages | where: 'title', 'Acronymes' %}
+        {% assign acronymArray = acronymSubpage[0].acronymes %}
+        <span class="legende-meta">Acronyme</span>
+        {% include acronymes.html acronymArray=acronymArray %}
+      </section>
+      {% endif %}
+
+      {% if total_periodes > 0 %}
+      <section class="meta-section profs-visible">
+        <h2>Périodes</h2>
+        <p class="periodes-ligne">{{ total_periodes }} / {{ timeunit | downcase }}</p>
+        <p class="periodes-ligne">{{ total_periodes | divided_by: 20.0 | round: 1 | append: "" | remove: ".0" | replace: ".", "," }} / semaine</p>
+      </section>
+      {% endif %}
+
+      {% if page.cursus %}
+      <section class="meta-section">
+        <h2>{{ timeunit }}</h2>
+        <ul class="liste-horizontale">
+          {% for item in page.cursus %}
+          {% for key in item %}
+          <li>{{ key.first }} : {{ key.last }}</li>
+          {% endfor %}
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      {% if page.profs %}
+      <section class="profs meta-section">
+        <h2>Profs</h2>
+        <ul class="liste-horizontale">
+          {% for item in page.profs %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      {% if page.competences %}
+      {% assign compSubpage = site.pages | where: 'title', 'Objectifs' %}
+      {% assign compArray = compSubpage[0].comp %}
+      <section class="meta-section meta-competences profs-visible flex-box box-100">
+        <h2>{{ site.objectifs | default: "Objectifs évaluateurs" }}</h2>
+        <ul class="objectifs-cours">
+          {% for item in page.competences %}
+          {% for key in item %}
+            {% assign cle = key.first %}
+            {% assign obj = nil %}
+            {% for domaine in site.data.objectifs %}
+              {% for competence in domaine.competences %}
+                {% for objectif in competence.objectifs %}
+                  {% assign parts = objectif.id | split: "-" %}
+                  {% if parts[0] == cle %}
+                    {% if parts.size == 1 or parts[1] == suffixe_page %}
+                      {% assign obj = objectif %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            {% endfor %}
+
+            {% if obj %}
+          <li class="obj-cours{% if obj.description %} toggle-row{% endif %}" data-comp="{{ cle }}">
+            <div class="obj-ligne">
+              {% if obj.description %}<button type="button" class="toggle" aria-expanded="true"><span class="chevron" aria-hidden="true"></span>{% else %}<span class="toggle-vide">{% endif %}<span class="id">{{ cle }}</span>
+                <span class="titre">{{ obj.titre }}</span>
+                {% if obj.taxonomie %}<span class="taxonomie" title="Niveau de la taxonomie de Bloom">{{ obj.taxonomie }}</span>{% endif %}{% if obj.description %}</button>{% else %}</span>{% endif %}
+              <span class="p-obj">{{ key.last }}&nbsp;p.</span>
+            </div>
+            {% if obj.description %}<div class="desc desc-inline">{{ obj.description | markdownify }}</div>{% endif %}
+          </li>
+            {% else %}
+          <li class="obj-cours" data-comp="{{ cle }}">
+            <div class="obj-ligne">
+              <span class="toggle-vide"><span class="id">{{ cle }}</span>{% if compArray[cle] %} <span class="titre">{{ compArray[cle] }}</span>{% endif %}</span>
+              <span class="p-obj">{{ key.last }}&nbsp;p.</span>
+            </div>
+          </li>
+            {% endif %}
+          {% endfor %}
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+    </footer>
+
+    <script src="{{ '/assets/js/depliage.js' | relative_url }}"></script>
 
     <section class="main-content-columns">
       {{ content }}

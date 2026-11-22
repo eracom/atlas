@@ -28,7 +28,12 @@ illustre le résultat.
 - `assets/css/style.css` contient tous les styles, en CSS natif (variables
   CSS, imbrication, media queries) : pas de Sass ni de compilation. Les
   variables sont déclarées dans `:root` ; les points de rupture (42em, 64em)
-  sont écrits en dur dans les `@media`. `assets/js/` contient le JavaScript.
+  sont écrits en dur dans les `@media`. Les layouts ne contiennent pas de
+  `<style>` : leurs styles sont dans des sections dédiées de `style.css`.
+- `assets/js/` contient le JavaScript. `depliage.js` gère les éléments
+  dépliables du tableau des objectifs (layout `objectifs`) et de la fiche de
+  cours (layout `cours`) ; il ajoute la classe `.js-depliage` sur `<html>`.
+  Les styles communs sont dans la section « Éléments dépliables communs ».
 - `_config.yml` configure le site de ce dépôt ; `index.md` et
   `another-page.md` sont des pages de démonstration, pas un plan de formation
   complet.

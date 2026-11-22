@@ -24,7 +24,7 @@
   --hr-border-color: #eff0f1;
 
   /* Tableau des objectifs */
-  --obj-border: #d9dde3;
+  --obj-border: #9e9e9e87;
   --obj-soft: #f4f6f8;
   --obj-ink: #1f2933;
   --obj-muted: #6b7785;
@@ -502,6 +502,182 @@ table {
   margin-top: 2rem;
 }
 
+/*
+ * Éléments dépliables communs
+ * Partagés par le tableau des objectifs (.objectifs-table) et la fiche de
+ * cours (.cours-meta). Le dépliage est géré par assets/js/depliage.js, qui
+ * ajoute la classe .js-depliage sur <html> ; sans JavaScript, tout reste
+ * visible. Chaque contexte ajuste ensuite ces règles dans sa propre section.
+ */
+
+.objectifs-table .legende,
+.cours-meta .legende-meta {
+  display: block;
+  margin-bottom: 0.1rem;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+:is(.objectifs-table, .cours-meta) {
+  /* Bouton de dépliage */
+
+  .toggle {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    cursor: default;
+    font: inherit;
+    color: inherit;
+
+    &:focus-visible {
+      outline: 2px solid var(--obj-accent);
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
+  }
+
+  /* Chevron (visible seulement avec JavaScript) */
+
+  .chevron {
+    display: none;
+  }
+
+  .js-depliage & {
+    .toggle {
+      cursor: pointer;
+    }
+
+    .chevron {
+      display: inline-block;
+      width: var(--chevron-size, 0.55em);
+      height: var(--chevron-size, 0.55em);
+      margin-right: 0.6em;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      transition: transform 0.15s ease;
+      vertical-align: 0.05em;
+      opacity: 0.75;
+    }
+
+    .toggle-row.open .chevron {
+      transform: rotate(45deg);
+    }
+  }
+
+  /* Pastille du niveau de taxonomie */
+
+  .taxonomie {
+    display: inline-block;
+    margin-left: 0.4em;
+    padding: 0 0.45em;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  /* Description repliable */
+
+  .desc {
+    max-width: 40em;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin: 0.3rem 0 0.3rem 1.1rem;
+      padding: 0;
+    }
+  }
+
+  .desc-inline {
+    line-height: 1.5;
+    cursor: auto;
+  }
+
+  .js-depliage & {
+    .desc-inline {
+      display: none;
+    }
+
+    .desc-inline.open {
+      display: block;
+    }
+  }
+}
+
+/* Fiche de cours : périodes et objectifs évaluateurs */
+
+.cours-meta {
+  --obj-muted: #4f5b57;
+  --obj-accent: #0b5fa8;
+  --chevron-size: 0.5em;
+
+  .periodes-ligne {
+    margin: 0.15em 0;
+  }
+
+  .objectifs-cours {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+  }
+
+  .obj-cours {
+    margin: 0;
+    padding: 0.45rem 0;
+    border-top: 1px solid var(--obj-border);
+
+    &:first-child {
+      border-top: 0;
+    }
+
+    .id {
+      font-weight: 700;
+      margin-right: 0.3em;
+    }
+  }
+
+  .obj-ligne {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+
+    .toggle,
+    .toggle-vide {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  .p-obj {
+    flex: 0 0 auto;
+    min-width: 3.5em;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .taxonomie {
+    opacity: 0.75;
+  }
+
+  .desc-inline {
+    margin: 0.4rem 0 0.2rem 1.1rem;
+    font-size: 0.9em;
+
+    > :first-child {
+      margin-top: 0;
+    }
+  }
+}
+
 /* Tableaux du cursus */
 
 .cursus {
@@ -591,8 +767,8 @@ td.code {
 
 /*
  * Tableau des objectifs (layout « objectifs »)
- * Le dépliage est géré par le script du layout, qui ajoute la classe
- * .js-objectifs sur <html> ; sans JavaScript, tout reste visible.
+ * Bouton, chevron, pastille et descriptions : voir « Éléments dépliables
+ * communs ». Cette section n'en garde que les ajustements propres au tableau.
  */
 
 .objectifs-table {
@@ -625,16 +801,6 @@ td.code {
 
   .col-cours {
     width: 38%;
-  }
-
-  .legende {
-    display: block;
-    margin-bottom: 0.1rem;
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    opacity: 0.6;
   }
 
   .periodes-cp {
@@ -683,48 +849,14 @@ td.code {
   /* Boutons de dépliage */
 
   .toggle {
-    all: unset;
-    box-sizing: border-box;
-    display: block;
     width: 100%;
-    cursor: default;
-    font: inherit;
-    color: inherit;
-
-    &:focus-visible {
-      outline: 2px solid var(--obj-accent);
-      outline-offset: 2px;
-      border-radius: 3px;
-    }
   }
 
-  .chevron,
   .toggle-vide::before {
     display: none;
   }
 
-  .js-objectifs & {
-    .toggle {
-      cursor: pointer;
-    }
-
-    .chevron {
-      display: inline-block;
-      width: 0.55em;
-      height: 0.55em;
-      margin-right: 0.6em;
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
-      transform: rotate(-45deg);
-      transition: transform 0.15s ease;
-      vertical-align: 0.05em;
-      opacity: 0.75;
-    }
-
-    .toggle-row.open .chevron {
-      transform: rotate(45deg);
-    }
-
+  .js-depliage & {
     tr.objectif:hover td {
       background: #f8fbff;
     }
@@ -751,15 +883,9 @@ td.code {
   }
 
   .taxonomie {
-    display: inline-block;
-    margin-left: 0.4em;
-    padding: 0 0.45em;
-    border: 1px solid var(--obj-border);
-    border-radius: 999px;
-    font-size: 0.72rem;
+    border-color: var(--obj-border);
     color: var(--obj-muted);
     background: #fff;
-    white-space: nowrap;
   }
 
   /* Descriptions repliables */
@@ -778,19 +904,8 @@ td.code {
   }
 
   .desc {
-    max-width: 40em;
-
     > :first-child {
       margin-top: 0.4rem;
-    }
-
-    > :last-child {
-      margin-bottom: 0;
-    }
-
-    ul {
-      margin: 0.3rem 0 0.3rem 1.1rem;
-      padding: 0;
     }
 
     li {
@@ -801,21 +916,11 @@ td.code {
   .desc-inline {
     margin: 0.5rem 0 0.2rem 1rem;
     font-size: 0.88rem;
-    line-height: 1.5;
     color: #3b4652;
     font-weight: 400;
-    cursor: auto;
   }
 
-  .js-objectifs & {
-    .desc-inline {
-      display: none;
-    }
-
-    .desc-inline.open {
-      display: block;
-    }
-
+  .js-depliage & {
     .desc-row {
       display: none;
     }
@@ -1068,25 +1173,27 @@ td.code {
     display: none;
   }
 
-  /* Tableau des objectifs : tout déplié */
+  /* Éléments dépliables : tout déplié, sans chevron */
+
+  .js-depliage :is(.objectifs-table, .cours-meta) .desc-inline {
+    display: block;
+  }
+
+  :is(.objectifs-table, .cours-meta) .chevron {
+    display: none !important;
+  }
+
+  /* Tableau des objectifs */
 
   .obj-tools {
     display: none !important;
   }
 
-  .js-objectifs .objectifs-table .desc-row {
+  .js-depliage .objectifs-table .desc-row {
     display: table-row;
-  }
-
-  .js-objectifs .objectifs-table .desc-inline {
-    display: block;
   }
 
   .objectifs-table thead th {
     position: static;
-  }
-
-  .objectifs-table .chevron {
-    display: none !important;
   }
 }
