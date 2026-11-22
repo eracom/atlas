@@ -1,9 +1,11 @@
 <style>
 
-{% assign colorSubpage = site.pages | where: 'title', 'Couleurs' %}
-{% assign colorArray = colorSubpage[0].couleurs %}
+{% comment %}
+  Couleurs du plan de formation, lues depuis _data/couleurs.yml du site.
+  Chaque paire clé/valeur génère une classe CSS.
+{% endcomment %}
 
-{% for valuePair in colorArray %}
+{% for valuePair in site.data.couleurs %}
   .{{ valuePair[0] }}{ background:{{valuePair[1]}}; }  
 {% endfor %}
 
